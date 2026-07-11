@@ -127,6 +127,17 @@ format: ## Format code with prettier
 swagger: ## Regenerate Swagger/OpenAPI spec (api-swagger.json)
 	cd $(API_DIR) && npm run swagger:generate
 
+##@ Code Generation
+
+.PHONY: swagger
+swagger: ## Regenerate Swagger/OpenAPI spec (api-swagger.json)
+	@echo "Regenerating Swagger spec..."
+ifeq ($(BACKEND),nodejs)
+	cd $(API_DIR) && npm run swagger:generate
+else
+	@echo "Swagger generation only supported for nodejs backend"
+endif
+
 ##@ Production
 
 .PHONY: start
