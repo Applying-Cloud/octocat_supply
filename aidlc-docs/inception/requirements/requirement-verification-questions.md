@@ -4,35 +4,53 @@ Por favor responde cada pregunta seleccionando la opción que mejor aplique. Lle
 
 ---
 
+## ⚠️ Restricciones Siempre Aplicadas (Always-Enforced Extension)
+
+La extensión `applying-standards.md` **no requiere opt-in** y se aplica como restricción obligatoria en todas las fases. Estas 3 gates son **requisitos no negociables**:
+
+| # | Gate | Requisito |
+|---|------|-----------|
+| 1 | **Auditoría Inmutable** | Todo cambio a Order/OrderDetail/Delivery → INSERT en `audit_log` (quién, qué, cuándo) |
+| 2 | **Autenticación Real** | JWT + bcrypt obligatorio. No se acepta mock authentication |
+| 3 | **No SQL Concatenada** | Solo queries parametrizadas. Se rechaza `${id}` en SQL strings |
+
+> Nota: Estas restricciones impactan directamente las Questions 1 y 2 a continuación — las opciones que no cumplen con estos gates ya están marcadas como incompatibles.
+
+---
+
 ## Question 1: Mecanismo de Sesión
 ¿Qué mecanismo de sesión se debe usar para autenticar usuarios después del login?
 
+> ⚠️ **Gate 2 (Autenticación Real)** requiere JWT + bcrypt. Opciones A, B, y D son compatibles. Opción C (sesiones server-side) no usa JWT y no cumple con la gate.
+
 A) JWT stateless almacenado en localStorage del cliente (simple, sin estado server-side, vulnerable a XSS)
 
-B) JWT almacenado en cookie httpOnly (protegido contra XSS, requiere CSRF protection)
+B) JWT almacenado en cookie httpOnly (protegido contra XSS, requiere CSRF protection) ✅ recomendado
 
-C) Sesiones server-side con cookie httpOnly (estado en servidor, más seguro, requiere almacenamiento de sesión)
+C) ~~Sesiones server-side con cookie httpOnly~~ ❌ **No compatible con Gate 2 (requiere JWT)**
 
-D) JWT con cookie httpOnly para access token + refresh token en cookie separada
+D) JWT con cookie httpOnly para access token + refresh token en cookie separada ✅ compatible
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: B
 
 ---
 
 ## Question 2: Librería de Hashing de Contraseñas
 ¿Qué librería se debe usar para hashear contraseñas?
 
-A) bcrypt (la más popular, bien probada, C bindings via bcryptjs o native)
+> ⚠️ **Gate 2 (Autenticación Real)** requiere bcrypt. Opción A es la requerida por la gate.
 
-B) argon2 (ganador de PHC, más resistente a GPU attacks, requiere compilación nativa)
+A) bcrypt (la más popular, bien probada, C bindings via bcryptjs o native) ✅ **requerido por Gate 2**
+
+B) argon2 (ganador de PHC, más resistente a GPU attacks, requiere compilación nativa) — puede usarse si se justifica superioridad técnica
 
 C) scrypt nativo de Node.js (built-in `crypto.scrypt`, sin dependencia externa, menor comunidad)
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: A
 
 ---
 
@@ -49,7 +67,7 @@ D) Sin restricciones específicas — solo validar que no esté vacía
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: C
 
 ---
 
@@ -64,7 +82,7 @@ C) Texto libre — el valor del rol es un string arbitrario sin restricción a n
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: B
 
 ---
 
@@ -79,7 +97,7 @@ C) Credenciales generadas aleatoriamente al ejecutar el seed — más seguro per
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: A
 
 ---
 
@@ -96,7 +114,7 @@ D) Self-registration abierto con aprobación — el usuario se registra pero que
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: A
 
 ---
 
@@ -113,7 +131,7 @@ D) Muy largo: 7 días (máxima conveniencia, menor seguridad)
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: A
 
 ---
 
@@ -128,7 +146,7 @@ C) No — dejarlo para una fase posterior (aceptar el riesgo de brute-force en e
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: C
 
 ---
 
@@ -141,7 +159,7 @@ B) Mensaje específico: "Email no encontrado" o "Contraseña incorrecta" (mejor 
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: A
 
 ---
 
@@ -156,7 +174,7 @@ C) Un campo `displayName` (texto libre, sin semántica de nombre/apellido)
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: B
 
 ---
 
@@ -171,7 +189,7 @@ B) No — omitir todas las reglas de SEGURIDAD (adecuado para PoCs, prototipos y
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: B
 
 ---
 
@@ -188,7 +206,7 @@ C) No — omitir todas las reglas PBT (adecuado para aplicaciones CRUD simples, 
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: C
 
 ---
 
@@ -203,6 +221,23 @@ B) No — omitir la resiliencia baseline (adecuado para PoCs, prototipos y proye
 
 X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
 
-[Answer]: 
+[Answer]: B
+
+---
+
+## Question 14: Implementación de Audit Log (Gate 1 — Auditoría Inmutable)
+> ⚠️ **Gate 1** requiere que toda mutación a Order, OrderDetail, y Delivery genere un INSERT en `audit_log`. Esta pregunta define los detalles de implementación.
+
+¿Cómo se debe implementar la tabla `audit_log` y su mecanismo de inserción?
+
+A) Trigger a nivel de base de datos — un SQLite trigger por cada tabla (Order, OrderDetail, Delivery) que inserta automáticamente en `audit_log` en cada INSERT/UPDATE/DELETE
+
+B) Middleware a nivel de aplicación — un interceptor en la capa de repositorio que captura cambios y escribe en `audit_log` antes de retornar la respuesta
+
+C) Ambos — trigger de DB como red de seguridad + logging aplicativo para contexto adicional (user_id, request metadata)
+
+X) Otro (por favor describe después de la etiqueta [Answer]: abajo)
+
+[Answer]: B
 
 ---

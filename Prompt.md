@@ -268,3 +268,16 @@ Ejecuta el framework AI-DLC y usa como input los documentos:
 
 - `Product-Definition/vision.md`
 - `Product-Definition/technical-environment.md`
+
+
+
+
+Vuelve a correr Requirements Analysis. Se agregó la extensión extensions/applying-standards.md que no fue considerada en la
+  ejecución previa
+
+
+User Story
+
+Agregar auditoria de inicio de sesion (login)
+
+Quitar Auditoría de Cambios en tablas principales como ordenes ya que actualmente no se encuentra implementado el proceso de crear ordenes
