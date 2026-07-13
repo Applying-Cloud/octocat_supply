@@ -2,7 +2,7 @@
  * Repository for branches data access
  */
 
-import { getDatabase, DatabaseConnection } from '../db/sqlite';
+import { getDatabase, DatabaseConnection } from '../db';
 import { Branch } from '../models/branch';
 import { handleDatabaseError, NotFoundError } from '../utils/errors';
 import { buildInsertSQL, buildUpdateSQL, objectToCamelCase, mapDatabaseRows, DatabaseRow } from '../utils/sql';

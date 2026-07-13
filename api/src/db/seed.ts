@@ -4,7 +4,8 @@
 
 import fs from 'fs';
 import path from 'path';
-import { getDatabase, DatabaseConnection } from './sqlite';
+import { getDatabase, DatabaseConnection } from './index';
+import { DB_CONFIG, TEST_DB_CONFIG } from './config';
 
 export class DatabaseSeeder {
   private db: DatabaseConnection;
@@ -103,10 +104,44 @@ export class DatabaseSeeder {
         await this.executeSeedFile(filename);
       }
 
+      // Reset sequences for PostgreSQL after inserting with explicit IDs
+      const config = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
+        ? TEST_DB_CONFIG
+        : DB_CONFIG;
+      if (config.DB_ENGINE === 'postgres') {
+        await this.resetPostgresSequences();
+      }
+
       console.log('🎉 Database seeding completed successfully!');
     } catch (error) {
       console.error('💥 Seeding failed:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Reset PostgreSQL sequences after inserting with explicit IDs
+   */
+  private async resetPostgresSequences(): Promise<void> {
+    const tables = [
+      { table: 'suppliers', column: 'supplier_id' },
+      { table: 'headquarters', column: 'headquarters_id' },
+      { table: 'branches', column: 'branch_id' },
+      { table: 'products', column: 'product_id' },
+      { table: 'orders', column: 'order_id' },
+      { table: 'order_details', column: 'order_detail_id' },
+      { table: 'deliveries', column: 'delivery_id' },
+      { table: 'order_detail_deliveries', column: 'order_detail_delivery_id' },
+    ];
+
+    for (const { table, column } of tables) {
+      try {
+        await this.db.run(
+          `SELECT setval(pg_get_serial_sequence('${table}', '${column}'), COALESCE((SELECT MAX(${column}) FROM ${table}), 0) + 1, false)`
+        );
+      } catch {
+        // Table might not have data yet, skip
+      }
     }
   }
 
@@ -116,23 +151,32 @@ export class DatabaseSeeder {
   public async clearDatabase(): Promise<void> {
     console.log('🧹 Clearing database...');
 
+    const config = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
+      ? TEST_DB_CONFIG
+      : DB_CONFIG;
+
     try {
-      // Get all table names
-      const tables = await this.db.all<{ name: string }>(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != 'migrations'",
-      );
-
-      // Disable foreign key constraints temporarily
-      await this.db.run('PRAGMA foreign_keys = OFF');
-
-      // Clear all tables
-      for (const table of tables) {
-        await this.db.run(`DELETE FROM ${table.name}`);
-        console.log(`🗑️ Cleared table: ${table.name}`);
+      if (config.DB_ENGINE === 'postgres') {
+        // PostgreSQL: use TRUNCATE with CASCADE
+        const tables = await this.db.all<{ tablename: string }>(
+          "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename != 'migrations'",
+        );
+        for (const table of tables) {
+          await this.db.run(`TRUNCATE TABLE ${table.tablename} CASCADE`);
+          console.log(`🗑️ Cleared table: ${table.tablename}`);
+        }
+      } else {
+        // SQLite: disable FK, delete, re-enable FK
+        const tables = await this.db.all<{ name: string }>(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != 'migrations'",
+        );
+        await this.db.run('PRAGMA foreign_keys = OFF');
+        for (const table of tables) {
+          await this.db.run(`DELETE FROM ${table.name}`);
+          console.log(`🗑️ Cleared table: ${table.name}`);
+        }
+        await this.db.run('PRAGMA foreign_keys = ON');
       }
-
-      // Re-enable foreign key constraints
-      await this.db.run('PRAGMA foreign_keys = ON');
 
       console.log('✅ Database cleared successfully');
     } catch (error) {

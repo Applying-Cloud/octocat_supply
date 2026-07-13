@@ -3,7 +3,7 @@ import request from 'supertest';
 import express from 'express';
 import branchRouter from './branch';
 import { runMigrations } from '../db/migrate';
-import { closeDatabase, getDatabase } from '../db/sqlite';
+import { closeDatabase, getDatabase } from '../db';
 import { errorHandler } from '../utils/errors';
 
 let app: express.Express;

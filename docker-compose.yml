@@ -1,6 +1,22 @@
 version: "3.8"
 
 services:
+  postgres:
+    image: postgres:18-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=octocat
+      - POSTGRES_PASSWORD=octocat_secret
+      - POSTGRES_DB=octocat_supply
+    volumes:
+      - pg-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U octocat -d octocat_supply"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api:
     build:
       context: ./api
@@ -9,7 +25,11 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - PYTHON_ENV=production
+      - DB_ENGINE=postgres
+      - DATABASE_URL=postgresql://octocat:octocat_secret@postgres:5432/octocat_supply
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   frontend:
     build:
@@ -20,5 +40,8 @@ services:
     depends_on:
       - api
     environment:
-      - API_HOST=api
+      - API_HOST=${API_HOST:-api}
       - API_PORT=3000
+      - API_PROTOCOL=${API_PROTOCOL:-https}
+volumes:
+  pg-data:

@@ -5,7 +5,7 @@
 
 import { runMigrations } from './db/migrate';
 import { seedDatabase } from './db/seed';
-import { closeDatabase } from './db/sqlite';
+import { closeDatabase } from './db';
 
 async function initializeDatabase(shouldSeed: boolean = true): Promise<void> {
   console.log('🚀 Initializing database...');

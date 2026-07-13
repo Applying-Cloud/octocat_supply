@@ -2,7 +2,7 @@
  * Repository for products data access
  */
 
-import { getDatabase, DatabaseConnection } from '../db/sqlite';
+import { getDatabase, DatabaseConnection } from '../db';
 import { Product } from '../models/product';
 import { handleDatabaseError, NotFoundError } from '../utils/errors';
 import { buildInsertSQL, buildUpdateSQL, objectToCamelCase, mapDatabaseRows, DatabaseRow } from '../utils/sql';
@@ -131,7 +131,8 @@ export class ProductsRepository {
   async findByName(name: string): Promise<Product[]> {
     try {
       const rows = await this.db.all<DatabaseRow>(
-        `SELECT * FROM products WHERE name LIKE '%${name}%' ORDER BY name`,
+        'SELECT * FROM products WHERE name LIKE ? ORDER BY name',
+        [`%${name}%`],
       );
       return mapDatabaseRows<Product>(rows);
     } catch (error) {

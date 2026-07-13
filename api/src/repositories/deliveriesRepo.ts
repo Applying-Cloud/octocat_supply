@@ -2,7 +2,7 @@
  * Repository for deliveries data access
  */
 
-import { getDatabase, DatabaseConnection } from '../db/sqlite';
+import { getDatabase, DatabaseConnection } from '../db';
 import { Delivery } from '../models/delivery';
 import { handleDatabaseError, NotFoundError } from '../utils/errors';
 import { buildInsertSQL, buildUpdateSQL, objectToCamelCase, mapDatabaseRows, DatabaseRow } from '../utils/sql';

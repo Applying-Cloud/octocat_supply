@@ -2,7 +2,7 @@
  * Repository for suppliers data access
  */
 
-import { getDatabase, DatabaseConnection } from '../db/sqlite';
+import { getDatabase, DatabaseConnection } from '../db';
 import { Supplier } from '../models/supplier';
 import { handleDatabaseError, NotFoundError } from '../utils/errors';
 import { buildInsertSQL, buildUpdateSQL, objectToCamelCase, mapDatabaseRows, DatabaseRow } from '../utils/sql';

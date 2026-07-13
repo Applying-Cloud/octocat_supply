@@ -13,6 +13,9 @@ import supplierRoutes from './routes/supplier';
 import { initializeDatabase } from './init-db';
 import { errorHandler } from './utils/errors';
 import { swaggerOptions } from './swagger-options';
+import { requestLogger } from './middleware/requestLogger';
+
+import { DB_CONFIG } from './db';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -57,6 +60,9 @@ app.get('/api-docs.json', (req, res) => {
 
 app.use(express.json());
 
+// Request logging middleware for traceability
+app.use(requestLogger);
+
 app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/order-detail-deliveries', orderDetailDeliveryRoutes);
 app.use('/api/products', productRoutes);
@@ -76,13 +82,41 @@ app.use(errorHandler);
 // Initialize database and start server
 async function startServer() {
   try {
-    console.log('🚀 Initializing database...');
+    console.log('');
+    console.log('╔══════════════════════════════════════════════════════╗');
+    console.log('║          🐱 OctoCAT Supply API - Starting           ║');
+    console.log('╚══════════════════════════════════════════════════════╝');
+    console.log('');
+
+    // Log database configuration
+    console.log('┌── 📦 Database Configuration ─────────────────────────');
+    console.log(`│  DB_ENGINE:       ${DB_CONFIG.DB_ENGINE}`);
+    if (DB_CONFIG.DB_ENGINE === 'postgres') {
+      // Mask password in connection string for security
+      const maskedUrl = DB_CONFIG.DATABASE_URL.replace(
+        /(:\/\/[^:]+:)([^@]+)(@)/,
+        '$1****$3'
+      );
+      console.log(`│  DATABASE_URL:    ${maskedUrl}`);
+    } else {
+      console.log(`│  DB_FILE:         ${DB_CONFIG.DB_FILE}`);
+      console.log(`│  DB_ENABLE_WAL:   ${DB_CONFIG.ENABLE_WAL}`);
+      console.log(`│  DB_FOREIGN_KEYS: ${DB_CONFIG.FOREIGN_KEYS}`);
+      console.log(`│  DB_TIMEOUT:      ${DB_CONFIG.TIMEOUT}ms`);
+    }
+    console.log('└───────────────────────────────────────────────────────');
+    console.log('');
+
+    console.log('🚀 Running database migrations...');
     await initializeDatabase(true); // Always attempt seeding - the seeder checks if it's needed
     console.log('✅ Database initialized successfully');
+    console.log('');
 
     app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-      console.log(`API documentation is available at http://localhost:${port}/api-docs`);
+      console.log('┌── 🌐 Server Ready ────────────────────────────────────');
+      console.log(`│  Port:     ${port}`);
+      console.log(`│  API Docs: http://localhost:${port}/api-docs`);
+      console.log('└───────────────────────────────────────────────────────');
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

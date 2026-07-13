@@ -4,7 +4,8 @@
 
 import fs from 'fs';
 import path from 'path';
-import { getDatabase, DatabaseConnection } from './sqlite';
+import { getDatabase, DatabaseConnection } from './index';
+import { DB_CONFIG, TEST_DB_CONFIG } from './config';
 
 interface Migration {
   version: number;
@@ -29,7 +30,7 @@ export class MigrationRunner {
             CREATE TABLE IF NOT EXISTS migrations (
                 version INTEGER PRIMARY KEY,
                 filename TEXT NOT NULL,
-                applied_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `;
 
@@ -93,6 +94,9 @@ export class MigrationRunner {
     console.log(`Applying migration ${migration.version}: ${migration.filename}`);
 
     try {
+      // Wrap migration in a transaction for atomicity
+      await this.db.run('BEGIN');
+
       // Split SQL into individual statements and execute each
       const statements = migration.sql
         .split(';')
@@ -111,8 +115,15 @@ export class MigrationRunner {
         migration.filename,
       ]);
 
+      await this.db.run('COMMIT');
       console.log(`✅ Migration ${migration.version} applied successfully`);
     } catch (error) {
+      // Rollback on failure to avoid partial migrations
+      try {
+        await this.db.run('ROLLBACK');
+      } catch {
+        // Rollback may fail if transaction was not started
+      }
       console.error(`❌ Failed to apply migration ${migration.version}: ${error}`);
       throw error;
     }
@@ -175,7 +186,11 @@ export class MigrationRunner {
  */
 export async function runMigrations(isTest: boolean = false): Promise<void> {
   const db = await getDatabase(isTest);
-  const migrationsDir = path.join(__dirname, '../../database/migrations');
+  const config = isTest ? TEST_DB_CONFIG : DB_CONFIG;
+
+  // Use the correct migrations directory based on engine
+  const migrationsFolder = config.DB_ENGINE === 'postgres' ? 'migrations-pg' : 'migrations';
+  const migrationsDir = path.join(__dirname, '../../database', migrationsFolder);
   const runner = new MigrationRunner(db, migrationsDir);
 
   await runner.runMigrations();

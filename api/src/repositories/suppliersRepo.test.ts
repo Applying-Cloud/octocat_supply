@@ -3,12 +3,12 @@ import { SuppliersRepository } from './suppliersRepo';
 import { NotFoundError } from '../utils/errors';
 
 // Mock the getDatabase function first
-vi.mock('../db/sqlite', () => ({
+vi.mock('../db', () => ({
     getDatabase: vi.fn()
 }));
 
 // Import the mocked module
-import { getDatabase } from '../db/sqlite';
+import { getDatabase } from '../db';
 
 describe('SuppliersRepository', () => {
     let repository: SuppliersRepository;

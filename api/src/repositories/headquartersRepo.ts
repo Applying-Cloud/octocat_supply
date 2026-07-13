@@ -2,7 +2,7 @@
  * Repository for headquarters data access
  */
 
-import { getDatabase, DatabaseConnection } from '../db/sqlite';
+import { getDatabase, DatabaseConnection } from '../db';
 import { Headquarters } from '../models/headquarters';
 import { handleDatabaseError, NotFoundError } from '../utils/errors';
 import { buildInsertSQL, buildUpdateSQL, objectToCamelCase, mapDatabaseRows, DatabaseRow } from '../utils/sql';
