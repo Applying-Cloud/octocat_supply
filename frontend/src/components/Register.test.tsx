@@ -145,8 +145,13 @@ describe('Register Component', () => {
     });
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/login');
+      expect(screen.getByTestId('register-success')).toBeInTheDocument();
+      expect(screen.getByTestId('register-success')).toHaveTextContent('Registration successful! Redirecting to login...');
     });
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/login');
+    }, { timeout: 4000 });
   });
 
   it('should display email conflict error from API', async () => {

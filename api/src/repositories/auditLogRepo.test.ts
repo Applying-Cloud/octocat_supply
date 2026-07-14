@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { AuditLogRepository } from './auditLogRepo';
+import { DatabaseConnection } from '../db/types';
 
 // Mock the getDatabase function
 vi.mock('../db', () => ({
@@ -23,7 +24,7 @@ describe('AuditLogRepository', () => {
       close: vi.fn(),
     };
 
-    repository = new AuditLogRepository(mockDb);
+    repository = new AuditLogRepository(mockDb as unknown as DatabaseConnection);
     vi.clearAllMocks();
   });
 

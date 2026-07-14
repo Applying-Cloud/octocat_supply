@@ -122,9 +122,32 @@ This stage generates code for each unit of work through two integrated parts:
 
 ## Step 13: Continue or Complete Generation
 - [ ] If more steps remain, return to Step 10
-- [ ] If all steps complete, proceed to present completion message
+- [ ] If all steps complete, proceed to Build Verification
 
-## Step 14: Present Completion Message
+## Step 14: Build Verification (MANDATORY)
+
+**Purpose**: Verify that ALL generated and modified code compiles and tests pass BEFORE presenting results to the user. This catches type errors, import issues, and test failures immediately.
+
+- [ ] **Run the project build/compile step** for each affected project:
+  - Identify the build command from `package.json`, `Makefile`, `pom.xml`, `Cargo.toml`, etc.
+  - Execute the compiler in check mode (e.g., `tsc --noEmit`, `mvn compile`, `cargo check`)
+  - For multi-project workspaces: build ALL affected projects (e.g., both API and Frontend)
+- [ ] **Run all unit tests** for generated code:
+  - Execute the test runner (e.g., `npx vitest run`, `mvn test`, `cargo test`)
+  - Verify all tests pass (0 failures)
+- [ ] **If build or tests fail**:
+  - Read the error output carefully
+  - Fix the failing code (type errors, import issues, test assertions)
+  - Re-run build and tests until ALL pass
+  - Update the plan checkboxes for any files that were fixed
+- [ ] **Log results** in the unit code generation plan:
+  - Record build status (pass/fail → pass)
+  - Record test count and pass rate
+  - Note any fixes applied during verification
+
+**CRITICAL**: Do NOT proceed to Step 15 (Present Completion Message) until build succeeds and all tests pass. This step is non-negotiable regardless of project size or complexity.
+
+## Step 15: Present Completion Message
 - Present completion message in this structure:
      1. **Completion Announcement** (mandatory): Always start with this:
 
@@ -157,12 +180,12 @@ This stage generates code for each unit of work through two integrated parts:
 ---
 ```
 
-## Step 15: Wait for Explicit Approval
+## Step 16: Wait for Explicit Approval
 - Do not proceed until the user explicitly approves the generated code
 - Approval must be clear and unambiguous
 - If user requests changes, update the code and repeat the approval process
 
-## Step 16: Record Approval and Update Progress
+## Step 17: Record Approval and Update Progress
 - Log approval in audit.md with timestamp
 - Record the user's approval response with timestamp
 - Mark Code Generation stage as complete for this unit in aidlc-state.md
@@ -212,6 +235,8 @@ When generating UI code (web, mobile, desktop), ensure elements are automation-f
 - Complete unit code generation plan created and approved
 - All steps in unit code generation plan marked [x]
 - All unit stories implemented according to plan
-- All code and tests generated (tests will be executed in Build & Test phase)
+- All code and tests generated
+- **Build verification passed** (compiler reports zero errors)
+- **All tests pass** (unit tests run successfully with zero failures)
 - Deployment artifacts generated
 - Complete unit ready for build and verification

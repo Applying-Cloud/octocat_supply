@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UsersRepository } from './usersRepo';
+import { DatabaseConnection } from '../db/types';
 
 // Mock the getDatabase function
 vi.mock('../db', () => ({
@@ -30,7 +31,7 @@ describe('UsersRepository', () => {
       close: vi.fn(),
     };
 
-    repository = new UsersRepository(mockDb);
+    repository = new UsersRepository(mockDb as unknown as DatabaseConnection);
     vi.clearAllMocks();
   });
 
@@ -63,7 +64,7 @@ describe('UsersRepository', () => {
       expect(result.firstName).toBe('John');
       expect(result.role).toBe('user');
       // Should not contain password_hash
-      expect((result as Record<string, unknown>)['passwordHash']).toBeUndefined();
+      expect((result as unknown as Record<string, unknown>)['passwordHash']).toBeUndefined();
     });
 
     it('should lowercase and trim the email', async () => {
@@ -144,7 +145,7 @@ describe('UsersRepository', () => {
       );
       expect(result?.email).toBe('test@example.com');
       expect(result?.role).toBe('admin');
-      expect((result as Record<string, unknown>)['passwordHash']).toBeUndefined();
+      expect((result as unknown as Record<string, unknown>)['passwordHash']).toBeUndefined();
     });
 
     it('should return null when user not found', async () => {

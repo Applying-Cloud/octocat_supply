@@ -21,6 +21,7 @@ export default function Register() {
   const [lastName, setLastName] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
   const { register } = useAuth();
   const { darkMode } = useTheme();
@@ -75,7 +76,8 @@ export default function Register() {
     setIsSubmitting(true);
     try {
       await register({ email, password, firstName, lastName });
-      navigate('/login');
+      setSuccess(true);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const data = error.response?.data;
@@ -128,6 +130,16 @@ export default function Register() {
             role="alert"
           >
             {errors.general}
+          </div>
+        )}
+
+        {success && (
+          <div
+            className="bg-green-500/10 border border-green-500 text-green-500 rounded-md p-3 mb-4"
+            data-testid="register-success"
+            role="status"
+          >
+            Registration successful! Redirecting to login...
           </div>
         )}
 
