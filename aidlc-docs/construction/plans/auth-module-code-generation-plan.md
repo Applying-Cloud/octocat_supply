@@ -29,17 +29,17 @@ API first (foundation), then Frontend (integration):
 ## Execution Steps
 
 ### Step 1: Install API Dependencies
-- [ ] Add `bcryptjs`, `jsonwebtoken`, `cookie-parser` to api/package.json dependencies
-- [ ] Add `@types/bcryptjs`, `@types/jsonwebtoken`, `@types/cookie-parser` to api/package.json devDependencies
-- [ ] Run `npm install` in api/
+- [x] Add `bcryptjs`, `jsonwebtoken`, `cookie-parser` to api/package.json dependencies
+- [x] Add `@types/bcryptjs`, `@types/jsonwebtoken`, `@types/cookie-parser` to api/package.json devDependencies
+- [x] Run `npm install` in api/
 
 **Stories**: US-02 (JWT), US-01 (bcrypt)
 
 ---
 
 ### Step 2: Database Migration — Users Table
-- [ ] Create `api/database/migrations/003_create_users.sql` (SQLite)
-- [ ] Create `api/database/migrations-pg/003_create_users.sql` (PostgreSQL)
+- [x] Create `api/database/migrations/003_create_users.sql` (SQLite)
+- [x] Create `api/database/migrations-pg/003_create_users.sql` (PostgreSQL)
 
 **Schema**:
 ```sql
@@ -59,8 +59,8 @@ CREATE TABLE users (
 ---
 
 ### Step 3: Database Migration — Audit Log Table
-- [ ] Create `api/database/migrations/004_create_audit_log.sql` (SQLite)
-- [ ] Create `api/database/migrations-pg/004_create_audit_log.sql` (PostgreSQL)
+- [x] Create `api/database/migrations/004_create_audit_log.sql` (SQLite)
+- [x] Create `api/database/migrations-pg/004_create_audit_log.sql` (PostgreSQL)
 
 **Schema**:
 ```sql
@@ -81,228 +81,228 @@ CREATE TABLE audit_log (
 ---
 
 ### Step 4: Database Seed — Dev Users
-- [ ] Create `api/database/seed/005_users.sql`
-- [ ] 3 users with pre-hashed bcrypt passwords:
+- [x] Create `api/database/seed/005_users.sql`
+- [x] 3 users with pre-hashed bcrypt passwords:
   - admin@octocat.com (role: admin)
   - manager@octocat.com (role: manager)
   - user@octocat.com (role: user)
-- [ ] All passwords: `OctoCAT2024!@` (documented for dev only)
+- [x] All passwords: `OctoCAT2024!@` (documented for dev only)
 
 **Stories**: US-02, US-06 (dev/testing)
 
 ---
 
 ### Step 5: Models — User and AuditLog Interfaces
-- [ ] Create `api/src/models/user.ts` with: `CreateUserInput`, `UserPublic`, `UserWithHash`
-- [ ] Create `api/src/models/auditLog.ts` with: `AuditLogEntry`, `AuditLogRecord`, `PaginationOptions`, `PaginatedResult<T>`
+- [x] Create `api/src/models/user.ts` with: `CreateUserInput`, `UserPublic`, `UserWithHash`
+- [x] Create `api/src/models/auditLog.ts` with: `AuditLogEntry`, `AuditLogRecord`, `PaginationOptions`, `PaginatedResult<T>`
 
 **Stories**: All (foundational types)
 
 ---
 
 ### Step 6: Validators Utility
-- [ ] Create `api/src/utils/validators.ts`
-- [ ] Implement `validateEmail(email)` — RFC-compliant regex
-- [ ] Implement `validatePassword(password)` — 12+ chars, uppercase, lowercase, number, special
-- [ ] Implement `validateRegistrationInput(input)` — combines all field validations
+- [x] Create `api/src/utils/validators.ts`
+- [x] Implement `validateEmail(email)` — RFC-compliant regex
+- [x] Implement `validatePassword(password)` — 12+ chars, uppercase, lowercase, number, special
+- [x] Implement `validateRegistrationInput(input)` — combines all field validations
 
 **Stories**: US-01 (registration validation), US-05 (error handling)
 
 ---
 
 ### Step 7: Validators Unit Tests
-- [ ] Create `api/src/utils/validators.test.ts`
-- [ ] Test valid/invalid emails
-- [ ] Test password policy (each requirement individually)
-- [ ] Test registration input (missing fields, invalid combinations)
+- [x] Create `api/src/utils/validators.test.ts`
+- [x] Test valid/invalid emails
+- [x] Test password policy (each requirement individually)
+- [x] Test registration input (missing fields, invalid combinations)
 
 **Stories**: US-01, US-05
 
 ---
 
 ### Step 8: Users Repository
-- [ ] Create `api/src/repositories/usersRepo.ts`
-- [ ] Implement `UsersRepository` class (follows existing pattern: constructor with `DatabaseConnection`)
-- [ ] Methods: `create()`, `findByEmail()`, `findByEmailPublic()`
-- [ ] Use parameterized queries exclusively (Gate 3)
-- [ ] Never return `password_hash` in public methods
+- [x] Create `api/src/repositories/usersRepo.ts`
+- [x] Implement `UsersRepository` class (follows existing pattern: constructor with `DatabaseConnection`)
+- [x] Methods: `create()`, `findByEmail()`, `findByEmailPublic()`
+- [x] Use parameterized queries exclusively (Gate 3)
+- [x] Never return `password_hash` in public methods
 
 **Stories**: US-01 (create), US-02 (findByEmail), US-03 (findByEmailPublic)
 
 ---
 
 ### Step 9: Audit Log Repository
-- [ ] Create `api/src/repositories/auditLogRepo.ts`
-- [ ] Implement `AuditLogRepository` class
-- [ ] Methods: `insertLoginEvent()`, `findAll()` (with pagination)
-- [ ] Append-only pattern (no update/delete methods)
-- [ ] Use parameterized queries exclusively (Gate 3)
+- [x] Create `api/src/repositories/auditLogRepo.ts`
+- [x] Implement `AuditLogRepository` class
+- [x] Methods: `insertLoginEvent()`, `findAll()` (with pagination)
+- [x] Append-only pattern (no update/delete methods)
+- [x] Use parameterized queries exclusively (Gate 3)
 
 **Stories**: US-06
 
 ---
 
 ### Step 10: Repository Unit Tests
-- [ ] Create `api/src/repositories/usersRepo.test.ts`
-- [ ] Create `api/src/repositories/auditLogRepo.test.ts`
-- [ ] Test CRUD operations with in-memory SQLite (follows branch.test.ts pattern)
-- [ ] Test duplicate email constraint
-- [ ] Test pagination for audit log
+- [x] Create `api/src/repositories/usersRepo.test.ts`
+- [x] Create `api/src/repositories/auditLogRepo.test.ts`
+- [x] Test CRUD operations with in-memory SQLite (follows branch.test.ts pattern)
+- [x] Test duplicate email constraint
+- [x] Test pagination for audit log
 
 **Stories**: US-01, US-06
 
 ---
 
 ### Step 11: Auth Middleware — verifyToken
-- [ ] Create `api/src/middleware/auth/verifyToken.ts`
-- [ ] Read JWT from `token` cookie
-- [ ] Verify signature with `JWT_SECRET` env var (default: `dev-secret-change-in-production`)
-- [ ] Verify expiration
-- [ ] Attach decoded user to `req.user` (email, role)
-- [ ] Return 401 if missing, invalid, or expired
+- [x] Create `api/src/middleware/auth/verifyToken.ts`
+- [x] Read JWT from `token` cookie
+- [x] Verify signature with `JWT_SECRET` env var (default: `dev-secret-change-in-production`)
+- [x] Verify expiration
+- [x] Attach decoded user to `req.user` (email, role)
+- [x] Return 401 if missing, invalid, or expired
 
 **Stories**: US-03 (session verification), US-05 (error handling)
 
 ---
 
 ### Step 12: Auth Middleware — requireRole
-- [ ] Create `api/src/middleware/auth/requireRole.ts`
-- [ ] Factory function: `requireRole(...roles)` returns middleware
-- [ ] Check `req.user.role` against allowed roles
-- [ ] Return 403 if role mismatch
-- [ ] Must run AFTER `verifyToken`
+- [x] Create `api/src/middleware/auth/requireRole.ts`
+- [x] Factory function: `requireRole(...roles)` returns middleware
+- [x] Check `req.user.role` against allowed roles
+- [x] Return 403 if role mismatch
+- [x] Must run AFTER `verifyToken`
 
 **Stories**: US-06 (admin-only audit log)
 
 ---
 
 ### Step 13: Auth Routes
-- [ ] Create `api/src/routes/auth.ts`
-- [ ] `POST /register` — validate → check duplicate → hash → store → 201
-- [ ] `POST /login` — validate → find user → compare → sign JWT → set cookie → audit → 200
-- [ ] `POST /logout` — clear cookie → 200
-- [ ] `GET /me` — verifyToken middleware → find user public → 200
+- [x] Create `api/src/routes/auth.ts`
+- [x] `POST /register` — validate → check duplicate → hash → store → 201
+- [x] `POST /login` — validate → find user → compare → sign JWT → set cookie → audit → 200
+- [x] `POST /logout` — clear cookie → 200
+- [x] `GET /me` — verifyToken middleware → find user public → 200
 
 **Stories**: US-01 (register), US-02 (login), US-03 (me), US-04 (logout)
 
 ---
 
 ### Step 14: Audit Log Routes
-- [ ] Create `api/src/routes/auditLog.ts`
-- [ ] `GET /` — verifyToken + requireRole('admin') → paginate → 200
-- [ ] Parse `page` and `pageSize` from query params (defaults: page=1, pageSize=20)
+- [x] Create `api/src/routes/auditLog.ts`
+- [x] `GET /` — verifyToken + requireRole('admin') → paginate → 200
+- [x] Parse `page` and `pageSize` from query params (defaults: page=1, pageSize=20)
 
 **Stories**: US-06
 
 ---
 
 ### Step 15: Modify API Entry Point (index.ts)
-- [ ] Add `cookie-parser` import and middleware registration (after `express.json()`)
-- [ ] Import and register auth routes: `app.use('/api/auth', authRoutes)`
-- [ ] Import and register audit routes: `app.use('/api/audit-log', auditLogRoutes)`
+- [x] Add `cookie-parser` import and middleware registration (after `express.json()`)
+- [x] Import and register auth routes: `app.use('/api/auth', authRoutes)`
+- [x] Import and register audit routes: `app.use('/api/audit-log', auditLogRoutes)`
 
 **Stories**: All (route registration)
 
 ---
 
 ### Step 16: Auth Routes Integration Tests
-- [ ] Create `api/src/routes/auth.test.ts`
-- [ ] Test full registration flow (success, duplicate, validation errors)
-- [ ] Test full login flow (success, wrong password, non-existent email)
-- [ ] Test session verification (valid token, expired, missing)
-- [ ] Test logout (cookie cleared)
-- [ ] Test audit log recording (success and failure events)
+- [x] Create `api/src/routes/auth.test.ts`
+- [x] Test full registration flow (success, duplicate, validation errors)
+- [x] Test full login flow (success, wrong password, non-existent email)
+- [x] Test session verification (valid token, expired, missing)
+- [x] Test logout (cookie cleared)
+- [x] Test audit log recording (success and failure events)
 
 **Stories**: US-01, US-02, US-03, US-04, US-05, US-06
 
 ---
 
 ### Step 17: Audit Log Routes Integration Tests
-- [ ] Create `api/src/routes/auditLog.test.ts`
-- [ ] Test admin access (200 with paginated data)
-- [ ] Test non-admin access (403)
-- [ ] Test unauthenticated access (401)
-- [ ] Test pagination params
+- [x] Create `api/src/routes/auditLog.test.ts`
+- [x] Test admin access (200 with paginated data)
+- [x] Test non-admin access (403)
+- [x] Test unauthenticated access (401)
+- [x] Test pagination params
 
 **Stories**: US-06
 
 ---
 
 ### Step 18: Frontend AuthContext Refactoring
-- [ ] Modify `frontend/src/context/AuthContext.tsx` (in-place, NO duplicate file)
-- [ ] Replace mock logic with real API calls via Axios
-- [ ] Add TanStack Query: `useQuery` for session (`GET /api/auth/me`)
-- [ ] Add `useMutation` for login, register, logout
-- [ ] Export: `user`, `isLoggedIn`, `isAdmin`, `isLoading`, `login`, `register`, `logout`
-- [ ] Handle session expiration (redirect to login)
-- [ ] Configure Axios with `withCredentials: true`
+- [x] Modify `frontend/src/context/AuthContext.tsx` (in-place, NO duplicate file)
+- [x] Replace mock logic with real API calls via Axios
+- [x] Add TanStack Query: `useQuery` for session (`GET /api/auth/me`)
+- [x] Add `useMutation` for login, register, logout
+- [x] Export: `user`, `isLoggedIn`, `isAdmin`, `isLoading`, `login`, `register`, `logout`
+- [x] Handle session expiration (redirect to login)
+- [x] Configure Axios with `withCredentials: true`
 
 **Stories**: US-02, US-03, US-04
 
 ---
 
 ### Step 19: Frontend Login Component Refactoring
-- [ ] Modify `frontend/src/components/Login.tsx` (in-place)
-- [ ] Wire form to `AuthContext.login()` mutation
-- [ ] Add client-side required field validation
-- [ ] Display generic error "Credenciales inválidas" on 401
-- [ ] Redirect to dashboard on success
-- [ ] Add link to Register page
-- [ ] Add `data-testid` attributes to all interactive elements
+- [x] Modify `frontend/src/components/Login.tsx` (in-place)
+- [x] Wire form to `AuthContext.login()` mutation
+- [x] Add client-side required field validation
+- [x] Display generic error "Credenciales inválidas" on 401
+- [x] Redirect to dashboard on success
+- [x] Add link to Register page
+- [x] Add `data-testid` attributes to all interactive elements
 
 **Stories**: US-02, US-05
 
 ---
 
 ### Step 20: Frontend Register Component
-- [ ] Create `frontend/src/components/Register.tsx` (NEW)
-- [ ] Form fields: email, firstName, lastName, password, confirmPassword
-- [ ] Client-side validation (email format, password policy display, required fields)
-- [ ] Wire to `AuthContext.register()` mutation
-- [ ] Display field-level error messages from API
-- [ ] Redirect to login on success
-- [ ] Add link to Login page
-- [ ] Add `data-testid` attributes to all interactive elements
+- [x] Create `frontend/src/components/Register.tsx` (NEW)
+- [x] Form fields: email, firstName, lastName, password, confirmPassword
+- [x] Client-side validation (email format, password policy display, required fields)
+- [x] Wire to `AuthContext.register()` mutation
+- [x] Display field-level error messages from API
+- [x] Redirect to login on success
+- [x] Add link to Login page
+- [x] Add `data-testid` attributes to all interactive elements
 
 **Stories**: US-01, US-05
 
 ---
 
 ### Step 21: Frontend Navigation Update
-- [ ] Modify `frontend/src/components/Navigation.tsx` (in-place)
-- [ ] Display authenticated user's first name in header
-- [ ] Show logout option when authenticated
-- [ ] Add `data-testid` to user display and logout elements
+- [x] Modify `frontend/src/components/Navigation.tsx` (in-place)
+- [x] Display authenticated user's first name in header
+- [x] Show logout option when authenticated
+- [x] Add `data-testid` to user display and logout elements
 
 **Stories**: US-02 (name display), US-04 (logout button)
 
 ---
 
 ### Step 22: Frontend App Routing Update
-- [ ] Modify `frontend/src/App.tsx` (in-place)
-- [ ] Add `/register` route pointing to `Register` component
-- [ ] Ensure route is accessible without authentication
+- [x] Modify `frontend/src/App.tsx` (in-place)
+- [x] Add `/register` route pointing to `Register` component
+- [x] Ensure route is accessible without authentication
 
 **Stories**: US-01
 
 ---
 
 ### Step 23: Frontend Unit Tests
-- [ ] Create `frontend/src/components/Register.test.tsx`
-- [ ] Create `frontend/src/components/Login.test.tsx`
-- [ ] Test form rendering, validation, submission, error display
-- [ ] Test navigation links between Login ↔ Register
-- [ ] Use `@testing-library/react` + vitest
+- [x] Create `frontend/src/components/Register.test.tsx`
+- [x] Create `frontend/src/components/Login.test.tsx`
+- [x] Test form rendering, validation, submission, error display
+- [x] Test navigation links between Login ↔ Register
+- [x] Use `@testing-library/react` + vitest
 
 **Stories**: US-01, US-02, US-05
 
 ---
 
 ### Step 24: Code Generation Summary Documentation
-- [ ] Create `aidlc-docs/construction/auth-module/code/code-summary.md`
-- [ ] Document all created/modified files
-- [ ] Document test coverage
-- [ ] Document story traceability
+- [x] Create `aidlc-docs/construction/auth-module/code/code-summary.md`
+- [x] Document all created/modified files
+- [x] Document test coverage
+- [x] Document story traceability
 
 **Stories**: All
 

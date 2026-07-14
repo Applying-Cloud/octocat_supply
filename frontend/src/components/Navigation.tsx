@@ -4,9 +4,13 @@ import { useTheme } from '../context/ThemeContext';
 import { useState } from 'react';
 
 export default function Navigation() {
-  const { isLoggedIn, isAdmin, logout } = useAuth();
+  const { isLoggedIn, isAdmin, user, logout } = useAuth();
   const { darkMode, toggleTheme } = useTheme();
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   return (
     <nav
@@ -118,13 +122,15 @@ export default function Navigation() {
               <>
                 <span
                   className={`${darkMode ? 'text-light' : 'text-gray-700'} text-sm transition-colors`}
+                  data-testid="nav-user-display"
                 >
                   {isAdmin && <span className="text-primary">(Admin) </span>}
-                  Welcome!
+                  Welcome, {user?.firstName}!
                 </span>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}
                   className={`${darkMode ? 'text-light hover:text-primary' : 'text-gray-700 hover:text-primary'} px-3 py-2 rounded-md text-sm font-medium transition-colors`}
+                  data-testid="nav-logout"
                 >
                   Logout
                 </button>

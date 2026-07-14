@@ -2,6 +2,7 @@ import express from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import deliveryRoutes from './routes/delivery';
 import orderDetailDeliveryRoutes from './routes/orderDetailDelivery';
 import productRoutes from './routes/product';
@@ -10,6 +11,8 @@ import orderRoutes from './routes/order';
 import branchRoutes from './routes/branch';
 import headquartersRoutes from './routes/headquarters';
 import supplierRoutes from './routes/supplier';
+import authRoutes from './routes/auth';
+import auditLogRoutes from './routes/auditLog';
 import { initializeDatabase } from './init-db';
 import { errorHandler } from './utils/errors';
 import { swaggerOptions } from './swagger-options';
@@ -59,6 +62,7 @@ app.get('/api-docs.json', (req, res) => {
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 // Request logging middleware for traceability
 app.use(requestLogger);
@@ -71,6 +75,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/headquarters', headquartersRoutes);
 app.use('/api/suppliers', supplierRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/audit-log', auditLogRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello, world!');
